@@ -104,8 +104,6 @@ public class AgentController: Agent
 
     }
 
-    updatelog
-
     private void OnTriggerEnter(Collider other)
     {
         int _reward = 0;
