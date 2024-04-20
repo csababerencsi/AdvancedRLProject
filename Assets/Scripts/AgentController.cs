@@ -9,6 +9,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.AI;
 using UnityEditor;
 
+
+
 public class AgentController: Agent
 {
     [SerializeField] Transform _target;
@@ -16,13 +18,9 @@ public class AgentController: Agent
     [SerializeField] float _moveSpeed = 3.0f;
     int _pelletsCollected = 0;
     int _overallScore = 0;
-    string _logMessage1 = "Pellets collected: ";
-    string _logMessage2 = "Overall Score: ";
+    readonly string _logMessage1 = "Pellets collected: ";
+    readonly string _logMessage2 = "Overall Score: ";
 
-    private void Start()
-    {
-        
-    }
     private void Update()
     {
         Debug.Log(_logMessage1 + _pelletsCollected);
@@ -66,7 +64,7 @@ public class AgentController: Agent
 
         float _actionSpeed = actionTaken[0];
         float _actionSteering = actionTaken[1];
-        transform.Translate(_actionSpeed * Vector3.forward * _moveSpeed * Time.fixedDeltaTime);
+        transform.Translate(_actionSpeed * _moveSpeed * Time.fixedDeltaTime * Vector3.forward);
         transform.Rotate(Vector3.up, _actionSteering * 225f * Time.fixedDeltaTime);
         AddReward(-0.01f);
     }
@@ -77,22 +75,22 @@ public class AgentController: Agent
         actions[0] = 0; // Vertical
         actions[1] = 0; // Horizontal
 
-        if (Input.GetKey("w"))
+        if (Input.GetKey(KeyCode.W))
         {
             actions[0] = 1;
         }
             
-        if (Input.GetKey("a"))
+        if (Input.GetKey(KeyCode.A))
         {
             actions[1] = -1;
         }
             
-        if (Input.GetKey("s"))
+        if (Input.GetKey(KeyCode.S))
         {
             actions[0] = -1;
         }
             
-        if (Input.GetKey("d"))
+        if (Input.GetKey(KeyCode.D))
         {
             actions[1] = +1;
         }
@@ -106,8 +104,8 @@ public class AgentController: Agent
 
     private void OnTriggerEnter(Collider other)
     {
-        int _reward = 0;
-        if (other.gameObject.tag == "Pellet")
+        int _reward;
+        if (other.gameObject.CompareTag("Pellet"))
         {
             _reward = 2;
             AddReward(_reward);
@@ -115,7 +113,7 @@ public class AgentController: Agent
             UpdateScore(_reward);
             EndEpisode();
         }
-        if(other.gameObject.tag == "Wall" || other.gameObject.tag == "Barrier")
+        if(other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Barrier"))
         {
             _reward = -1;
             AddReward(_reward);
