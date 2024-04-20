@@ -4,12 +4,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
-using Unity.MLAgents.Integrations.Match3;
-using UnityEngine.EventSystems;
-using UnityEngine.AI;
-using UnityEditor;
-
-
+using TMPro;
 
 public class AgentController: Agent
 {
@@ -18,21 +13,40 @@ public class AgentController: Agent
     [SerializeField] float _moveSpeed = 3.0f;
     int _pelletsCollected = 0;
     int _overallScore = 0;
-    readonly string _logMessage1 = "Pellets collected: ";
-    readonly string _logMessage2 = "Overall Score: ";
+    //private const float MAX_DISTANCE = 28.28427f;
 
-    private void Update()
-    {
-        Debug.Log(_logMessage1 + _pelletsCollected);
-        Debug.Log(_logMessage2 + _overallScore);
-    }
-
+    [SerializeField] TextMeshProUGUI _pelletText;
+    [SerializeField] TextMeshProUGUI _overallText;
     public override void OnEpisodeBegin()
     {
-        float randomizerAgentX = Random.Range(-4.44f, 4.44f);
-        float randomizerAgentZ = Random.Range(-1.7f, 1.7f);
+        Vector3 upperLeftCorner = new Vector3(-4.44f, 0.25f, -1.7f);
+        Vector3 lowerLeftCorner = new Vector3(-4.44f, 0.25f, 1.7f);
+        Vector3 upperRightCorner = new Vector3(4.44f, 0.25f, 1.7f);
+        Vector3 lowerRightCorner = new Vector3(4.44f, 0.25f, -1.7f);
+
+        int _randomizedAgentPosition = Random.Range(0, 0);
+        Vector3 agentSpawnPoint;
+
+        switch (_randomizedAgentPosition)
+        {
+            case 0:
+                agentSpawnPoint = upperLeftCorner;
+                break;
+            case 1:
+                agentSpawnPoint = lowerLeftCorner;
+                break;
+            case 2:
+                agentSpawnPoint = upperRightCorner;
+                break;
+            case 3:
+                agentSpawnPoint = lowerRightCorner;
+                break;
+            default:
+                agentSpawnPoint = new Vector3(0f, 0f, 0f);
+                break;
+        }
         // Starting point
-        transform.localPosition = new Vector3(randomizerAgentX, 0.25f, randomizerAgentZ);
+        transform.localPosition = agentSpawnPoint;
 
         // Pellet random location
         float randomizerX = Random.Range(-4.5f, 4.5f);
@@ -41,7 +55,6 @@ public class AgentController: Agent
 
         // Barrier position
         _obstacle.localPosition = new Vector3(1.5f, 0.5f, 2.1f);
-
     }
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -55,7 +68,6 @@ public class AgentController: Agent
 
         // Distance between the agent and the target
         sensor.AddObservation(Vector3.Distance(_target.localPosition, transform.localPosition));
-
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -66,7 +78,13 @@ public class AgentController: Agent
         float _actionSteering = actionTaken[1];
         transform.Translate(_actionSpeed * _moveSpeed * Time.fixedDeltaTime * Vector3.forward);
         transform.Rotate(Vector3.up, _actionSteering * 225f * Time.fixedDeltaTime);
-        AddReward(-0.01f);
+        //AddReward(-0.01f);
+        /*
+        float distance_scaled = Vector3.Distance(TargetTransform.localPosition, transform.localPosition) / MAX_DISTANCE;
+        //Debug.Log(distance_scaled);
+
+        AddReward(-distance_scaled / 10); // [0, 0.1]
+        */
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -94,32 +112,32 @@ public class AgentController: Agent
         {
             actions[1] = +1;
         }
-              
-    }
-    public void UpdateScore(int _receivedReward)
-    {
-        _overallScore += _receivedReward;
-
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
         int _reward;
-        if (other.gameObject.CompareTag("Pellet"))
+        if (collision.collider.CompareTag("Pellet"))
         {
             _reward = 2;
             AddReward(_reward);
-            _pelletsCollected ++;
-            UpdateScore(_reward);
+            _pelletsCollected++;
+            _overallScore += _reward;
             EndEpisode();
         }
-        if(other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Barrier"))
+        if(collision.collider.CompareTag("Wall") || collision.collider.CompareTag("Barrier"))
         {
             _reward = -1;
             AddReward(_reward);
-            UpdateScore(_reward);
+            if (_overallScore > 0)
+                _overallScore += _reward;
             EndEpisode();
         }
 
+    }
+    private void Update()
+    {
+        _pelletText.text = "Pellets collected: " + _pelletsCollected;
+        _overallText.text = "Overall Score: " + _overallScore;
     }
 }

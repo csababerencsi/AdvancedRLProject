@@ -473,8 +473,8 @@ GameObject:
   - component: {fileID: 8751986777237006823}
   - component: {fileID: 3099968034873669569}
   - component: {fileID: 1080697266157488089}
-  - component: {fileID: 1363931482100616727}
   - component: {fileID: 1539393922937219232}
+  - component: {fileID: 6420157015571057783}
   m_Layer: 0
   m_Name: Agent
   m_TagString: Untagged
@@ -621,8 +621,25 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   _target: {fileID: 0}
+  _obstacle: {fileID: 0}
   _moveSpeed: 2
---- !u!54 &1363931482100616727
+  _pelletText: {fileID: 0}
+  _overallText: {fileID: 0}
+--- !u!114 &1539393922937219232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155920491314940703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1
+--- !u!54 &6420157015571057783
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -649,20 +666,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &1539393922937219232
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1155920491314940703}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DecisionPeriod: 5
-  TakeActionsBetweenDecisions: 1
 --- !u!1 &1428350897825284449
 GameObject:
   m_ObjectHideFlags: 0
