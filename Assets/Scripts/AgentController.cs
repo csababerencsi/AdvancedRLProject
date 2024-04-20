@@ -10,7 +10,7 @@ public class AgentController: Agent
 {
     [SerializeField] Transform _target;
     [SerializeField] Transform _obstacle;
-    [SerializeField] float _moveSpeed = 3.0f;
+    [SerializeField] float _moveSpeed = 5.0f;
     int _pelletsCollected = 0;
     int _overallScore = 0;
     //private const float MAX_DISTANCE = 28.28427f;
@@ -19,34 +19,24 @@ public class AgentController: Agent
     [SerializeField] TextMeshProUGUI _overallText;
     public override void OnEpisodeBegin()
     {
-        Vector3 upperLeftCorner = new Vector3(-4.44f, 0.25f, -1.7f);
-        Vector3 lowerLeftCorner = new Vector3(-4.44f, 0.25f, 1.7f);
-        Vector3 upperRightCorner = new Vector3(4.44f, 0.25f, 1.7f);
-        Vector3 lowerRightCorner = new Vector3(4.44f, 0.25f, -1.7f);
+        Vector3 upperLeftCorner = new(-4f, 0.25f, -1.7f);
+        Vector3 lowerLeftCorner = new(-4f, 0.25f, 1.7f);
+        Vector3 upperRightCorner = new(4f, 0.25f, 1.7f);
+        Vector3 lowerRightCorner = new(4f, 0.25f, -1.7f);
 
-        int _randomizedAgentPosition = Random.Range(0, 0);
-        Vector3 agentSpawnPoint;
-
-        switch (_randomizedAgentPosition)
+        int _randomizedAgentPosition = 0;   //Random.Range(0, 4)
+        var agentSpawnPoint = _randomizedAgentPosition switch
         {
-            case 0:
-                agentSpawnPoint = upperLeftCorner;
-                break;
-            case 1:
-                agentSpawnPoint = lowerLeftCorner;
-                break;
-            case 2:
-                agentSpawnPoint = upperRightCorner;
-                break;
-            case 3:
-                agentSpawnPoint = lowerRightCorner;
-                break;
-            default:
-                agentSpawnPoint = new Vector3(0f, 0f, 0f);
-                break;
-        }
+            0 => upperLeftCorner,
+            1 => lowerLeftCorner,
+            2 => upperRightCorner,
+            3 => lowerRightCorner,
+            _ => new Vector3(0f, 0f, 0f),
+        };
+
         // Starting point
         transform.localPosition = agentSpawnPoint;
+        transform.rotation = Quaternion.identity;
 
         // Pellet random location
         float randomizerX = Random.Range(-4.5f, 4.5f);
@@ -65,9 +55,16 @@ public class AgentController: Agent
         // Target position
         sensor.AddObservation(_target.localPosition.x);
         sensor.AddObservation(_target.localPosition.y);
+        
+        // Obstacle position
+        sensor.AddObservation(_obstacle.localPosition.x);
+        sensor.AddObservation(_obstacle.localPosition.y);
 
         // Distance between the agent and the target
         sensor.AddObservation(Vector3.Distance(_target.localPosition, transform.localPosition));
+
+        // Distance between the agent and the obstacle
+        sensor.AddObservation(Vector3.Distance(_obstacle.localPosition, transform.localPosition));
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -133,7 +130,6 @@ public class AgentController: Agent
                 _overallScore += _reward;
             EndEpisode();
         }
-
     }
     private void Update()
     {

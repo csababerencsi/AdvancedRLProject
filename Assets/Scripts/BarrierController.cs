@@ -13,16 +13,23 @@ public class BarrierController : MonoBehaviour
     [SerializeField] float _speed = 0.5f;
     Vector3 pointA;
     Vector3 pointB;
+    
 
     void Start()
     {
-        pointA = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-        pointB = new Vector3(transform.localPosition.x, transform.localPosition.y, -transform.localPosition.z);
+        if (gameObject.CompareTag("Barrier"))
+        {
+            pointA = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
+            pointB = new Vector3(transform.localPosition.x, transform.localPosition.y, -transform.localPosition.z);
+        }        
     }
 
     void Update()
     {
-        float time = Mathf.PingPong(Time.time, 2f);
-        transform.position = Vector3.Lerp(pointA, pointB, time * _speed);
+        if (gameObject.CompareTag("Barrier"))
+        {
+            float time = Mathf.PingPong(Time.time, 2f);
+            transform.position = Vector3.Lerp(pointA, pointB, time * _speed);
+        }
     }
 }
