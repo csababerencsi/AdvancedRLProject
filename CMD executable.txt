@@ -1,0 +1,4 @@
+venv\Scripts\activate
+mlagents-learn .\PelletSearch.yaml --run-id="PelletSearch1BarrierRun01"
+
+tensorboard --logdir results --reload_multifile True

@@ -17,19 +17,13 @@ public class BarrierController : MonoBehaviour
 
     void Start()
     {
-        if (gameObject.CompareTag("Barrier"))
-        {
             pointA = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-            pointB = new Vector3(transform.localPosition.x, transform.localPosition.y, -transform.localPosition.z);
-        }        
+            pointB = new Vector3(transform.localPosition.x, transform.localPosition.y, -transform.localPosition.z);       
     }
 
     void Update()
     {
-        if (gameObject.CompareTag("Barrier"))
-        {
             float time = Mathf.PingPong(Time.time, 2f);
-            transform.position = Vector3.Lerp(pointA, pointB, time * _speed);
-        }
+            transform.localPosition = Vector3.Lerp(pointA, pointB, time * _speed);
     }
 }

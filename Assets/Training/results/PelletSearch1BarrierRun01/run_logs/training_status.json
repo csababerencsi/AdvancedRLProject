@@ -2,22 +2,22 @@
     "PelletSearch": {
         "checkpoints": [
             {
-                "steps": 178454,
-                "file_path": "results\\PelletSearch1BarrierRun01\\PelletSearch\\PelletSearch-178454.onnx",
-                "reward": -0.9230769230769231,
-                "creation_time": 1713635809.6214797,
+                "steps": 435665,
+                "file_path": "results\\PelletSearch1BarrierRun01\\PelletSearch\\PelletSearch-435665.onnx",
+                "reward": 2.0,
+                "creation_time": 1713800457.5615158,
                 "auxillary_file_paths": [
-                    "results\\PelletSearch1BarrierRun01\\PelletSearch\\PelletSearch-178454.pt"
+                    "results\\PelletSearch1BarrierRun01\\PelletSearch\\PelletSearch-435665.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 178454,
+            "steps": 435665,
             "file_path": "results\\PelletSearch1BarrierRun01\\PelletSearch.onnx",
-            "reward": -0.9230769230769231,
-            "creation_time": 1713635809.6214797,
+            "reward": 2.0,
+            "creation_time": 1713800457.5615158,
             "auxillary_file_paths": [
-                "results\\PelletSearch1BarrierRun01\\PelletSearch\\PelletSearch-178454.pt"
+                "results\\PelletSearch1BarrierRun01\\PelletSearch\\PelletSearch-435665.pt"
             ]
         }
     },

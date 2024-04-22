@@ -8,40 +8,62 @@ using TMPro;
 
 public class AgentController: Agent
 {
-    [SerializeField] Transform _target;
-    [SerializeField] Transform _obstacle;
+    [SerializeField] Transform _target; //GameObject?
+    [SerializeField] Transform _obstacle; //GameObject?
     [SerializeField] float _moveSpeed = 5.0f;
     int _pelletsCollected = 0;
     int _overallScore = 0;
+    int _episodeCount = 0;
+    Vector3 _agentSpawnPoint = new(0f, 0f, 0f);
     //private const float MAX_DISTANCE = 28.28427f;
 
     [SerializeField] TextMeshProUGUI _pelletText;
     [SerializeField] TextMeshProUGUI _overallText;
-    public override void OnEpisodeBegin()
+    public override void OnEpisodeBegin() //count number of episodes
     {
-        Vector3 upperLeftCorner = new(-4f, 0.25f, -1.7f);
-        Vector3 lowerLeftCorner = new(-4f, 0.25f, 1.7f);
-        Vector3 upperRightCorner = new(4f, 0.25f, 1.7f);
-        Vector3 lowerRightCorner = new(4f, 0.25f, -1.7f);
 
-        int _randomizedAgentPosition = 0;   //Random.Range(0, 4)
-        var agentSpawnPoint = _randomizedAgentPosition switch
-        {
-            0 => upperLeftCorner,
-            1 => lowerLeftCorner,
-            2 => upperRightCorner,
-            3 => lowerRightCorner,
-            _ => new Vector3(0f, 0f, 0f),
-        };
+        Vector3 upperLeftCorner = new(-4f, 0.25f, 1.7f);
+        var _upperLeftCornerRotation = Quaternion.Euler(0f, 135f, 0f);
+
+        Vector3 lowerLeftCorner = new(-4f, 0.25f, -1.7f);
+        var _lowerLeftCornerRotation = Quaternion.Euler(0f, 45f, 0f);
+
+        Vector3 upperRightCorner = new(4f, 0.25f, 1.7f);
+        var _upperRightCornerRotation = Quaternion.Euler(0f, -135f, 0f);
+
+        Vector3 lowerRightCorner = new(4f, 0.25f, -1.7f);
+        var _lowerRightCornerRotation = Quaternion.Euler(0f, -45f, 0f);
+
+
+        if (_episodeCount < 1000) {
+            _agentSpawnPoint = lowerLeftCorner;
+            transform.rotation = _lowerLeftCornerRotation;
+        }
+        else if (_episodeCount < 2000) {
+            _agentSpawnPoint = lowerRightCorner;
+            transform.rotation = _lowerRightCornerRotation;
+        }
+        else if (_episodeCount < 3000) {
+            _agentSpawnPoint = upperLeftCorner;
+            transform.rotation = _upperLeftCornerRotation;
+        }
+        else if (_episodeCount < 4000) {
+            _agentSpawnPoint = upperRightCorner;
+            transform.rotation = _upperRightCornerRotation;
+        }
 
         // Starting point
-        transform.localPosition = agentSpawnPoint;
-        transform.rotation = Quaternion.identity;
+        transform.localPosition = _agentSpawnPoint;
+        float randomizerX = 0f;
+        float randomizerZ = 0f;
 
-        // Pellet random location
-        float randomizerX = Random.Range(-4.5f, 4.5f);
-        float randomizerZ = Random.Range(-2f,2f);
-        _target.localPosition = new Vector3(randomizerX, 0.25f, randomizerZ);
+        do
+        {
+            // Pellet random location
+            randomizerX = Random.Range(-4.5f, 4.5f);
+            randomizerZ = Random.Range(-2f, 2f);
+            _target.localPosition = new Vector3(randomizerX, 0.25f, randomizerZ);
+        } while (Vector3.Distance(_target.localPosition, transform.localPosition) < 2f);
 
         // Barrier position
         _obstacle.localPosition = new Vector3(1.5f, 0.5f, 2.1f);
@@ -50,15 +72,17 @@ public class AgentController: Agent
     {
         // Agent position
         sensor.AddObservation(transform.localPosition.x);
-        sensor.AddObservation(transform.localPosition.y);
+        sensor.AddObservation(transform.localPosition.z);
+        sensor.AddObservation(transform.rotation.x);
+        sensor.AddObservation(transform.rotation.z);
 
         // Target position
         sensor.AddObservation(_target.localPosition.x);
-        sensor.AddObservation(_target.localPosition.y);
+        sensor.AddObservation(_target.localPosition.z);
         
         // Obstacle position
         sensor.AddObservation(_obstacle.localPosition.x);
-        sensor.AddObservation(_obstacle.localPosition.y);
+        sensor.AddObservation(_obstacle.localPosition.z);
 
         // Distance between the agent and the target
         sensor.AddObservation(Vector3.Distance(_target.localPosition, transform.localPosition));
@@ -71,10 +95,11 @@ public class AgentController: Agent
     {
         var actionTaken = actions.ContinuousActions;
 
-        float _actionSpeed = actionTaken[0];
+        float _actionSpeed = (actionTaken[0] + 1)/2; // actionTaken[0]; // for backward
         float _actionSteering = actionTaken[1];
-        transform.Translate(_actionSpeed * _moveSpeed * Time.fixedDeltaTime * Vector3.forward);
-        transform.Rotate(Vector3.up, _actionSteering * 225f * Time.fixedDeltaTime);
+        transform.Translate(_actionSpeed * Vector3.forward * _moveSpeed * Time.fixedDeltaTime);
+        transform.Rotate(Vector3.up, _actionSteering * 180f * Time.fixedDeltaTime);
+        //transform.rotation = Quaternion.Euler(0f, _actionSteering * 180f , 0f);
         //AddReward(-0.01f);
         /*
         float distance_scaled = Vector3.Distance(TargetTransform.localPosition, transform.localPosition) / MAX_DISTANCE;
@@ -87,7 +112,7 @@ public class AgentController: Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         ActionSegment<float> actions = actionsOut.ContinuousActions;
-        actions[0] = 0; // Vertical
+        actions[0] = -1; // Vertical // actions[0] = 0;  // for backward
         actions[1] = 0; // Horizontal
 
         if (Input.GetKey(KeyCode.W))
@@ -99,7 +124,7 @@ public class AgentController: Agent
         {
             actions[1] = -1;
         }
-            
+        
         if (Input.GetKey(KeyCode.S))
         {
             actions[0] = -1;
@@ -111,24 +136,26 @@ public class AgentController: Agent
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
         int _reward;
-        if (collision.collider.CompareTag("Pellet"))
+        if (collider.CompareTag("Pellet"))
         {
             _reward = 2;
             AddReward(_reward);
             _pelletsCollected++;
             _overallScore += _reward;
             EndEpisode();
+            _episodeCount++;
         }
-        if(collision.collider.CompareTag("Wall") || collision.collider.CompareTag("Barrier"))
+        if(collider.CompareTag("Wall") || collider.CompareTag("Barrier"))
         {
             _reward = -1;
             AddReward(_reward);
             if (_overallScore > 0)
                 _overallScore += _reward;
             EndEpisode();
+            _episodeCount++;
         }
     }
     private void Update()
