@@ -10,20 +10,20 @@ using UnityEngine.AI;
 
 public class BarrierController : MonoBehaviour
 {
-    [SerializeField] float _speed = 0.5f;
-    Vector3 pointA;
-    Vector3 pointB;
-    
+    [SerializeField] float _speed = 1.5f;
+    Vector3 _startPos = new(1.5f, 0.5f, 2.1f);
+    Vector3 _endPos = new(1.5f, 0.5f, -2.1f);
+    bool _isMovingForward = true;
 
-    void Start()
+    void FixedUpdate()
     {
-            pointA = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-            pointB = new Vector3(transform.localPosition.x, transform.localPosition.y, -transform.localPosition.z);       
-    }
+        Vector3 _target = _isMovingForward ? _endPos : _startPos;
 
-    void Update()
-    {
-            float time = Mathf.PingPong(Time.time, 2f);
-            transform.localPosition = Vector3.Lerp(pointA, pointB, time * _speed);
+        transform.localPosition = Vector3.MoveTowards(transform.localPosition, _target, Time.deltaTime * _speed);
+
+        if(Vector3.Distance(transform.localPosition, _target) < 0.001f)
+        {
+            _isMovingForward = !_isMovingForward;
+        }
     }
 }
