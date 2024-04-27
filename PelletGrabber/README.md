@@ -1,2 +1,0 @@
-# PelletGrabberVercel
- Deployed project 
